@@ -1,10 +1,29 @@
+<?php 
+session_start();
+
+// Strict Authentication Check
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: login.php?redirect=blog.php");
+    exit();
+}
+
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
+// Log activity visit
+include_once 'api/General.php';
+$general = new GeneralHandler();
+$general->logActivity($_SESSION['UserID'], 'page_visit', null, 'blog.php');
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>TechPulse Blog</title>
-
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root {
       --primary: #0f172a;
@@ -157,17 +176,7 @@
 <body>
 
   <!-- NAVBAR -->
-  <header>
-    <nav>
-      <h1>TechPulse</h1>
-      <ul>
-        <li><a href="#">Home</a></li>
-        <li><a href="#">Blog</a></li>
-        <li><a href="#">About</a></li>
-        <li><a href="#">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
+  <?php include_once 'includes/header.php'; ?>
 
   <!-- HERO -->
   <section class="hero">
@@ -181,41 +190,70 @@
     <!-- FILTERS -->
     <div class="filters">
       <button class="active" onclick="filterPosts('all')">All</button>
-      <button onclick="filterPosts('ai')">AI</button>
-      <button onclick="filterPosts('web')">Web</button>
-      <button onclick="filterPosts('security')">Security</button>
+      <?php
+      $conn = mysqli_connect("localhost", "root", "", "ispaceblogdb");
+      if ($conn) {
+          $catResult = mysqli_query($conn, "SELECT Category FROM add_category_00001 ORDER BY CreationDate ASC");
+          while ($catRow = mysqli_fetch_assoc($catResult)) {
+              $catName = htmlspecialchars($catRow['Category']);
+              $catSlug = strtolower(trim($catRow['Category']));
+              echo '<button onclick="filterPosts(\'' . $catSlug . '\')">' . $catName . '</button>';
+          }
+      }
+      ?>
     </div>
 
     <!-- POSTS -->
     <div class="blog-grid" id="blogGrid">
-
-      <div class="card" data-category="ai">
-        <img src="https://source.unsplash.com/600x400/?artificial-intelligence" />
-        <div class="card-content">
-          <span>AI</span>
-          <h3>The Future of Artificial Intelligence</h3>
-          <p>How AI is reshaping industries worldwide.</p>
-        </div>
-      </div>
-
-      <div class="card" data-category="web">
-        <img src="https://source.unsplash.com/600x400/?web-development" />
-        <div class="card-content">
-          <span>Web</span>
-          <h3>Modern Web Development Trends</h3>
-          <p>Frameworks, performance, and design systems.</p>
-        </div>
-      </div>
-
-      <div class="card" data-category="security">
-        <img src="https://source.unsplash.com/600x400/?cyber-security" />
-        <div class="card-content">
-          <span>Security</span>
-          <h3>Cybersecurity in 2026</h3>
-          <p>Protecting data in a connected world.</p>
-        </div>
-      </div>
-
+      <?php
+      if ($conn) {
+          $blogSql = "
+              SELECT b.*, 
+                     (SELECT COUNT(*) FROM blog_comments c WHERE c.BlogID = b.BlogID AND c.StatusID = 'A') AS CommentsCount 
+              FROM blog_add_00001 b 
+              WHERE b.StatusID = 'A' 
+              ORDER BY b.CreationDate DESC
+          ";
+          $blogResult = mysqli_query($conn, $blogSql);
+          if (mysqli_num_rows($blogResult) > 0) {
+              while ($blogRow = mysqli_fetch_assoc($blogResult)) {
+                  $imgSrc = !empty($blogRow['Image']) ? 'api/uploads/blogs/' . htmlspecialchars($blogRow['Image']) : 'https://images.unsplash.com/photo-1556157382-97eda2d62296';
+                  $categorySlug = strtolower(trim($blogRow['Category']));
+                  $excerpt = substr(strip_tags($blogRow['Content']), 0, 100);
+                  if (strlen(strip_tags($blogRow['Content'])) > 100) {
+                      $excerpt .= '...';
+                  }
+                  ?>
+                  <div class="card" data-category="<?= htmlspecialchars($categorySlug) ?>">
+                    <a href="blog-detail.php?id=<?= htmlspecialchars($blogRow['BlogID']) ?>">
+                      <img src="<?= $imgSrc ?>" alt="<?= htmlspecialchars($blogRow['Title']) ?>" />
+                    </a>
+                    <div class="card-content">
+                      <span><?= htmlspecialchars($blogRow['Category']) ?></span>
+                      <h3 class="hover:text-blue-600 transition">
+                        <a href="blog-detail.php?id=<?= htmlspecialchars($blogRow['BlogID']) ?>">
+                          <?= htmlspecialchars($blogRow['Title']) ?>
+                        </a>
+                      </h3>
+                      <p class="text-gray-600 text-sm mb-4"><?= htmlspecialchars($excerpt) ?></p>
+                      <div class="flex flex-col gap-1 border-t pt-3 mt-3 text-xs text-gray-500">
+                        <div class="flex justify-between">
+                          <span>By <strong><?= htmlspecialchars($blogRow['Author']) ?></strong></span>
+                          <span><?= date('M d, Y H:i', strtotime($blogRow['CreationDate'])) ?></span>
+                        </div>
+                        <div class="text-blue-600 font-semibold mt-1">
+                          💬 <?= (int)$blogRow['CommentsCount'] ?> comment(s)
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <?php
+              }
+          } else {
+              echo '<p class="col-span-full text-center text-gray-500 py-8">No published blog posts found.</p>';
+          }
+      }
+      ?>
     </div>
   </section>
 
@@ -245,3 +283,4 @@
 
 </body>
 </html>
+

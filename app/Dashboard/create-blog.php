@@ -1,8 +1,10 @@
 <?php
 session_start();
+if(!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || !isset($_SESSION['Role']) || $_SESSION['Role'] !== 'admin'){
+  header("Location: ../index.php");
+  exit;
+}
 $name = $_SESSION['FullName'];
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -194,7 +196,7 @@ $name = $_SESSION['FullName'];
 
           data.forEach(cat => {
             const option = document.createElement("option");
-            option.value = cat;
+            //option.value = cat;
             option.textContent = cat;
             select.appendChild(option);
           });
@@ -204,40 +206,40 @@ $name = $_SESSION['FullName'];
       }
 
       async function submitBlog(formData) {
-  try {
-    const response = await fetch("/ispaceBlog/api/?endpoint=CreateBlog", {
-      method: "POST",
-      body: formData
-    });
+        try {
+          const response = await fetch("/ispaceBlog/api/?endpoint=CreateBlog", {
+            method: "POST",
+            body: formData
+          });
 
-    const text = await response.text();   // 👈 read raw text first
-    let res;
+          const text = await response.text(); // 👈 read raw text first
+          let res;
 
-    if (!text) {
-      Swal.fire("Server Error", "Empty response from server", "error");
-      return;
-    }
+          if (!text) {
+            Swal.fire("Server Error", "Empty response from server", "error");
+            return;
+          }
 
-    try {
-      res = JSON.parse(text);
-    } catch (err) {
-      Swal.fire("Server Error", "Invalid JSON response:\n" + text, "error");
-      console.error("RAW RESPONSE:", text);
-      return;
-    }
+          try {
+            res = JSON.parse(text);
+          } catch (err) {
+            Swal.fire("Server Error", "Invalid JSON response:\n" + text, "error");
+            console.error("RAW RESPONSE:", text);
+            return;
+          }
 
-    if (res.success === "Yes") {
-      Swal.fire("Success 🎉", res.message || "Blog published", "success");
-      document.getElementById("blogForm").reset();
-      quill.root.innerHTML = "";
-    } else {
-      Swal.fire("Failed", res.message || "Something went wrong", "error");
-    }
+          if (res.success === "Yes") {
+            Swal.fire("Success 🎉", res.message || "Blog published", "success");
+            document.getElementById("blogForm").reset();
+            quill.root.innerHTML = "";
+          } else {
+            Swal.fire("Failed", res.message || "Something went wrong", "error");
+          }
 
-  } catch (error) {
-    Swal.fire("Network Error", error.message, "error");
-  }
-}
+        } catch (error) {
+          Swal.fire("Network Error", error.message, "error");
+        }
+      }
 
 
       //submitting of form
@@ -290,173 +292,18 @@ $name = $_SESSION['FullName'];
           didOpen: () => Swal.showLoading()
         });
         //submit blog
-         submitBlog(formData);
-        // try {
-        //   const response = await fetch("../api/?endpoint=CreateBlog", {
-        //     method: "POST",
-        //     body: formData
-        //   });
+        submitBlog(formData);
 
-        //   const res = await response.json();
-        //   Swal.close();
-
-        //   if (res.success === "Yes") {
-        //     Swal.fire("Success 🎉", res.message || "Blog published", "success");
-        //     document.getElementById("blogForm").reset();
-        //     quill.root.innerHTML = "";
-        //   } else {
-        //     Swal.fire("Failed", res.message || "Something went wrong", "error");
-        //   }
-
-        // } catch (error) {
-        //   Swal.close();
-        //   Swal.fire("Error", "Server not responding", "error");
-        //   console.error(error);
-        // }
       });
 
     })
     // end
   </script>
- <!-- <script>
-  document.addEventListener("DOMContentLoaded", function () {
 
-  // ✅ 1. INIT QUILL
-  const quill = new Quill('#editor', {
-    theme: 'snow',
-    placeholder: 'Write your blog content here...',
-    modules: {
-      toolbar: [
-        [{ header: [1, 2, 3, false] }],
-        ['bold', 'italic', 'underline'],
-        [{ list: 'ordered' }, { list: 'bullet' }],
-        ['link', 'image'],
-        ['clean']
-      ]
-    }
-  });
 
-  // ✅ 2. LOAD CATEGORIES
-  getData();
-  async function getData() {
-    try {
-      const response = await fetch("api/?endpoint=GetAllCategory");
-      const text = await response.text();
-      let result;
-
-      try {
-        result = JSON.parse(text);
-      } catch (err) {
-        Swal.fire("Server Error", "Invalid category response:\n" + text, "error");
-        return;
-      }
-
-      if (result.success === "Yes") {
-        const select = document.getElementById("categorySelect");
-        select.innerHTML = `<option value="">-- Select Category --</option>`;
-
-        Object.values(result.data).forEach(cat => {
-          const option = document.createElement("option");
-          option.value = cat;
-          option.textContent = cat;
-          select.appendChild(option);
-        });
-      }
-    } catch (error) {
-      Swal.fire("Error", "Failed to load categories", "error");
-      console.error(error);
-    }
-  }
-
-  // ✅ 3. FORM SUBMIT HANDLER
-  document.getElementById("blogForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    submitBlog();
-  });
-
-  // ✅ 4. ASYNC SUBMIT FUNCTION
-  async function submitBlog() {
-
-    const title = document.querySelector('[name="title"]').value.trim();
-    const author = document.querySelector('[name="author"]').value.trim();
-    const category = document.querySelector('[name="category"]').value;
-    const imageInput = document.querySelector('[name="image"]');
-    const image = imageInput.files[0];
-
-    const quillContent = quill.root.innerHTML.trim();
-    document.getElementById("content").value = quillContent;
-
-    // ✅ VALIDATION
-    if (!title) {
-      Swal.fire("Missing Title", "Blog title is required", "warning");
-      return;
-    }
-
-    if (!category) {
-      Swal.fire("Select Category", "Please choose a category", "warning");
-      return;
-    }
-
-    if (quillContent === "<p><br></p>" || quillContent.length < 20) {
-      Swal.fire("Content Required", "Blog content is too short", "warning");
-      return;
-    }
-
-    // ✅ FORMDATA
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("author", author);
-    formData.append("category", category);
-    formData.append("content", quillContent);
-
-    if (image) {
-      formData.append("image", image);
-    }
-
-    Swal.fire({
-      title: "Publishing...",
-      text: "Please wait",
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
-    });
-
-    try {
-      const response = await fetch("api/?endpoint=CreateBlog", {
-        method: "POST",
-        body: formData
-      });
-
-      const text = await response.text();
-      let res;
-
-      try {
-        res = JSON.parse(text);
-      } catch (err) {
-        Swal.close();
-        Swal.fire("Server Error", "Invalid server response:\n" + text, "error");
-        return;
-      }
-
-      Swal.close();
-
-      if (res.success === "Yes") {
-        Swal.fire("Success 🎉", res.message || "Blog published", "success");
-        document.getElementById("blogForm").reset();
-        quill.root.innerHTML = "";
-      } else {
-        Swal.fire("Failed", res.message || "Something went wrong", "error");
-      }
-
-    } catch (error) {
-      Swal.close();
-      Swal.fire("Network Error", error.message, "error");
-      console.error(error);
-    }
-  }
-
-});
-</script> -->
  
+
+
   <!-- sweeet alert -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

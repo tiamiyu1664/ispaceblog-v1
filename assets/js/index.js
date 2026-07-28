@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
     formData.append("Password", Password);
 
     // ✅ 5. SEND WITH FETCH
-    fetch("api/?endpoint=LoginBlogUser", {
+    fetch("../api/?endpoint=LoginAdminUser", {
       method: "POST",
       body: formData
     })
@@ -60,14 +60,8 @@ document.addEventListener("DOMContentLoaded", function () {
           timer: 2000,
           showConfirmButton: false
         }).then(() => {
-          const urlParams = new URLSearchParams(window.location.search);
-          const redirectUrl = urlParams.get('redirect');
-          if (redirectUrl) {
-            window.location.href = redirectUrl;
-          } else if (data.redirect) {
+          if (data.redirect) {
             window.location.href = data.redirect;
-          } else {
-            window.location.href = "blog.php";
           }
         });
 

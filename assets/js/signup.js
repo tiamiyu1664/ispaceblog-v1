@@ -79,19 +79,36 @@ $(document).ready(function () {
 
         if (data.success === true || data.success === "Yes") {
           Swal.fire("Success", "Account created successfully!", "success").then(() => {
-            // ✅ NAVIGATION HERE
-            window.location.href = data.redirect;
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectUrl = urlParams.get('redirect');
+            if (redirectUrl) {
+              window.location.href = 'login.php?redirect=' + encodeURIComponent(redirectUrl);
+            } else {
+              window.location.href = data.redirect || "login.php";
+            }
           });
-          // $("#signupForm")[0].reset();
         } else {
           Swal.fire("Error", data.message || "Registration failed", "error");
         }
       },
       error: function (xhr, status, error) {
         Swal.close();
+        let redirectTarget = "login.php";
+        try {
+          const errData = JSON.parse(xhr.responseText);
+          if (errData.redirect) {
+            redirectTarget = errData.redirect;
+          }
+        } catch (e) {}
+
         Swal.fire("Server Error", xhr.responseText || `${status}: ${error}`, "error").then(() => {
-          // ✅ NAVIGATION HERE
-          window.location.href = JSON.parse(xhr.responseText).redirect;
+          const urlParams = new URLSearchParams(window.location.search);
+          const redirectUrl = urlParams.get('redirect');
+          if (redirectUrl) {
+            window.location.href = 'login.php?redirect=' + encodeURIComponent(redirectUrl);
+          } else {
+            window.location.href = redirectTarget;
+          }
         });
         console.error(xhr.responseText);
       }

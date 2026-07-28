@@ -35,6 +35,25 @@ class GeneralHandler{
         error_log($logMessage, 3, $logFilePath);
         
     }
+
+    public function logActivity($userID, $activityType, $blogID = null, $pageURL = '')
+    {
+        try {
+            $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $ua = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+            $creationDate = date("Y-m-d H:i:s");
+            
+            $sql = "INSERT INTO user_activity_log (UserID, ActivityType, BlogID, PageURL, IPAddress, UserAgent, CreationDate)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $this->conn->prepare($sql);
+            if ($stmt) {
+                $stmt->bind_param("sssssss", $userID, $activityType, $blogID, $pageURL, $ip, $ua, $creationDate);
+                $stmt->execute();
+            }
+        } catch (Exception $e) {
+            $this->Errorlog("Failed to log activity: " . $e->getMessage());
+        }
+    }
 }
 
 
