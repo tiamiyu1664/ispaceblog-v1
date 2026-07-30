@@ -179,7 +179,7 @@ $general->logActivity($_SESSION['UserID'], 'page_visit', null, 'blog.php');
   <?php include_once 'includes/header.php'; ?>
 
   <!-- HERO -->
-  <section class="hero">
+  <section class="hero ">
     <h2>Latest Insights in Technology</h2>
     <p>Stay updated with trends in AI, Web Development, Cybersecurity, and more.</p>
   </section>

@@ -1,6 +1,6 @@
 <aside id="sidebar-menu" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transform -translate-x-full md:translate-x-0 md:static md:flex transition-transform duration-300 ease-in-out">
     <div class="p-6 text-2xl font-black tracking-tight border-b border-slate-800 bg-slate-950 flex justify-between items-center">
-        <span>TechPulse</span>
+        <span>ISpaceTech</span>
         <button id="close-sidebar-btn" class="md:hidden text-slate-400 hover:text-white focus:outline-none">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -21,7 +21,7 @@
     </nav>
 
     <div class="p-4 border-t border-slate-800 text-xs text-slate-500 bg-slate-950">
-        © 2026 TechPulse Dashboard
+        © 2026 ISpaceTech Dashboard
     </div>
 </aside>
 

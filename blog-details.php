@@ -295,7 +295,7 @@ while ($row = $commentsResult->fetch_assoc()) {
             if (data.success === "Yes") {
               Swal.fire({
                 icon: "success",
-                title: "Submitted! 🎉",
+                title: "Submitted! ",
                 text: data.message || "Your comment has been submitted and is awaiting approval.",
                 confirmButtonColor: "#3b82f6"
               }).then(() => {

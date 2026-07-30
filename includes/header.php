@@ -8,11 +8,11 @@ $userRole = $_SESSION['Role'] ?? '';
 ?>
 <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-xs">
     <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16 items-center">
+        <div class="flex justify-between h-16 items-center w-full">
             <!-- Brand Logo -->
             <div class="flex-shrink-0 flex items-center">
                 <a href="index.php" class="flex items-center space-x-2">
-                    <span class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">TechPulse</span>
+                    <span class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">ISpaceTech</span>
                 </a>
             </div>
 

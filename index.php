@@ -1,11 +1,12 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+  session_start();
 }
 $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -19,11 +20,17 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
     body {
       font-family: 'Inter', sans-serif;
     }
-    h1, h2, h3, h4, .font-display {
+
+    h1,
+    h2,
+    h3,
+    h4,
+    .font-display {
       font-family: 'Outfit', sans-serif;
     }
   </style>
 </head>
+
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
 
   <!-- NAVBAR -->
@@ -36,7 +43,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
     <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center relative z-10">
       <div class="space-y-6">
         <span class="inline-flex items-center bg-blue-500/20 text-blue-400 text-xs px-3 py-1.5 rounded-full font-semibold uppercase tracking-wider">
-          🚀 Welcome to TechPulse
+          Welcome to IspaceTech
         </span>
         <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight">
           Stay Ahead in <br>
@@ -67,10 +74,10 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
 
   <!-- MAIN EXPLORE AREA -->
   <main id="explore" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    
+
     <!-- SEARCH & FILTER BAR -->
     <div class="bg-white rounded-2xl shadow-xs border border-slate-100 p-6 mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6">
-      
+
       <!-- Category Tabs -->
       <div class="flex flex-wrap gap-2" id="categoryTabs">
         <button onclick="selectCategory('all')" id="tab-all" class="category-tab px-4 py-2 text-sm font-semibold rounded-xl bg-blue-600 text-white shadow-xs transition">
@@ -146,7 +153,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
   <footer class="bg-slate-900 text-slate-400 py-12 px-6 border-t border-slate-800">
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
       <div class="space-y-4">
-        <span class="text-xl font-black text-white">TechPulse</span>
+        <span class="text-xl font-black text-white">ISpaceTech</span>
         <p class="text-sm leading-relaxed text-slate-400">
           Empowering technology professionals with modern development guides and industry updates.
         </p>
@@ -245,7 +252,7 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
 
     function selectCategory(category) {
       activeCategory = category;
-      
+
       // Update Tab Styles
       document.querySelectorAll(".category-tab").forEach(tab => {
         tab.className = "category-tab px-4 py-2 text-sm font-semibold rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition";
@@ -265,15 +272,15 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
 
     function filterAndRender() {
       const searchVal = document.getElementById("searchInput").value.toLowerCase().trim();
-      
+
       // Filter list
       let filtered = allBlogs;
       if (activeCategory !== 'all') {
         filtered = filtered.filter(post => post.Category.toLowerCase() === activeCategory.toLowerCase());
       }
       if (searchVal) {
-        filtered = filtered.filter(post => 
-          post.Title.toLowerCase().includes(searchVal) || 
+        filtered = filtered.filter(post =>
+          post.Title.toLowerCase().includes(searchVal) ||
           post.Content.toLowerCase().includes(searchVal) ||
           post.Author.toLowerCase().includes(searchVal)
         );
@@ -325,9 +332,9 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
       container.classList.remove("hidden");
 
       const imgSrc = post.Image ? `api/uploads/blogs/${post.Image}` : 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=1200&q=80';
-      const readUrl = isLoggedIn 
-        ? `blog-detail.php?id=${post.BlogID}` 
-        : `login.php?redirect=blog-detail.php%3Fid%3D${post.BlogID}`;
+      const readUrl = isLoggedIn ?
+        `blog-detail.php?id=${post.BlogID}` :
+        `login.php?redirect=blog-detail.php%3Fid%3D${post.BlogID}`;
 
       const excerpt = cleanExcerpt(post.Content, 180);
 
@@ -380,9 +387,9 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
       div.className = "bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-xs hover:shadow-md hover:translate-y-[-4px] transition duration-300 flex flex-col justify-between group";
 
       const imgSrc = post.Image ? `api/uploads/blogs/${post.Image}` : 'https://images.unsplash.com/photo-1556157382-97eda2d62296?auto=format&fit=crop&w=800&q=80';
-      const readUrl = isLoggedIn 
-        ? `blog-detail.php?id=${post.BlogID}` 
-        : `login.php?redirect=blog-detail.php%3Fid%3D${post.BlogID}`;
+      const readUrl = isLoggedIn ?
+        `blog-detail.php?id=${post.BlogID}` :
+        `login.php?redirect=blog-detail.php%3Fid%3D${post.BlogID}`;
 
       const excerpt = cleanExcerpt(post.Content, 100);
 
@@ -435,10 +442,15 @@ $isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
     }
 
     function formatDate(dateStr) {
-      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      const options = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      };
       const date = new Date(dateStr.replace(/-/g, "/"));
       return date.toLocaleDateString('en-US', options);
     }
   </script>
 </body>
+
 </html>
